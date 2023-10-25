@@ -11,17 +11,19 @@ map yang ada. Inti dari game ini player dapat melakukan tugas yang mana saja tan
 para player, bermain game ini sebagai sarana penghilang stress yang sederhana.
 
 ## 1.3. Branding
-### A. Nama/Merk Game :
+### 1.3.1. Nama/Merk Game :
 Jack In The Woods
-### B. Tagline :
+### 1.3.2. Tagline :
 Gaming and chill without stress
-### C. Target User :
+### 1.3.3. Target User :
 - Usia 15 tahun ke atas
 - Pemain yang mencari ketenangan saat bermain game
 - Pemain yang ingin bernostalgia dengan retro game
 - Penikmat game indie
-### D. Genre :
+### 1.3.4. Genre :
 Indie retro RPG
+### 1.3.5. Poster :
+(TBD)
 
 ## 2. User Story
 
@@ -30,6 +32,7 @@ Sebagai | Saya Ingin Bisa | Sehingga | Prioritas
 PLayer | Bergerak ke mana saja | Bisa mengeksplorasi | ⭐⭐⭐⭐⭐
 Player | Menabrak objek | Bisa berinteraksi dengan objek tertentu | ⭐⭐⭐⭐⭐
 Player | Berinteraksi dengan NPC | Bisa menyelesaikan quest yang diberi | ⭐⭐⭐⭐⭐
+Player | Bermain dengan musik berjalan di background | Nuansa chill / anti-stress tercipta | ⭐⭐⭐⭐⭐
 Player | Menyimpan barang ke inventory | Bisa menyimpan barang | ⭐⭐⭐⭐
 Player | Menebang pohon | Menyelesaikan quest menebang pohon | ⭐⭐⭐
 Player | Save data | Data terakhir bisa tersimpan | ⭐⭐⭐
