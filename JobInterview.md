@@ -23,7 +23,8 @@ Gaming and chill without stress
 ### 1.3.4. Genre :
 Indie retro RPG
 ### 1.3.5. Poster :
-(TBD)
+
+
 
 ## 2. User Story
 
@@ -56,13 +57,13 @@ erDiagram
 Masih pake mermaid.js juga bisa lihat flowchart di [https://mermaid.js.org/syntax/flowchart.html](https://mermaid.js.org/syntax/flowchart.html)
 
 ## 5. Teknologi, Library, dan Framework
-
-bla bla bla
+Teknologi yang saya gunakan untuk membuat game yang satu ini adalah java
+Library yang saya gunakan adalah Java Standard Libraries (Java Swing, Java awt)
+Framework yang akan saya gunakan adalah spring framework
 
 ## 6. Desain User Experience dan User Interface
 
-Bisa load image 
-![Contoh](https://fastly.picsum.photos/id/318/536/354.jpg?hmac=Ixy-wle80nudIR_cmnF1iY2y6rMUH7_9sk-BP1fTpM8)
+
 
 ## 7. Demonstrasi Video
 
