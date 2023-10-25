@@ -25,9 +25,18 @@ Indie retro RPG
 
 ## 2. User Story
 
-bla | bla | bla | bla
+Sebagai | Saya Ingin Bisa | Sehingga | Prioritas
 ---|---|---|---
-bla | bla | bla | ⭐⭐⭐⭐⭐
+PLayer | Bergerak ke mana saja | Bisa mengeksplorasi | ⭐⭐⭐⭐⭐
+Player | Menabrak objek | Bisa berinteraksi dengan objek tertentu | ⭐⭐⭐⭐⭐
+Player | Berinteraksi dengan NPC | Bisa menyelesaikan quest yang diberi | ⭐⭐⭐⭐⭐
+Player | Menyimpan barang ke inventory | Bisa menyimpan barang | ⭐⭐⭐⭐
+Player | Menebang pohon | Menyelesaikan quest menebang pohon | ⭐⭐⭐
+Player | Save data | Data terakhir bisa tersimpan | ⭐⭐⭐
+Player | Load data | Memuat data terakhir | ⭐⭐⭐
+Player | Berpindah map | Bisa bereksplorasi | ⭐⭐⭐
+Player | Masuk ke rumah | Bisa bereksplorasi | ⭐⭐⭐
+
 
 ## 3. Struktur Data
 
