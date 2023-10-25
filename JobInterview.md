@@ -23,7 +23,7 @@ Gaming and chill without stress
 ### 1.3.4. Genre :
 Indie retro RPG
 ### 1.3.5. Poster :
-
+![poster](https://github.com/fadligg/fadligg.github.io/assets/144420686/04beebea-8cb0-4f53-b610-9910cbf0302d)
 
 
 ## 2. User Story
