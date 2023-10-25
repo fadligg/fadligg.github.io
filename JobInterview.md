@@ -26,6 +26,7 @@ Indie retro RPG
 ![poster](https://github.com/fadligg/fadligg.github.io/assets/144420686/04beebea-8cb0-4f53-b610-9910cbf0302d)
 ### 1.3.6 Inspirasi Design :
 <img width="635" alt="image" src="https://github.com/fadligg/fadligg.github.io/assets/144420686/b05dfd5c-d1b7-4ba0-be41-9ed402b7f62d">
+
 ![pokemon-game-maker](https://github.com/fadligg/fadligg.github.io/assets/144420686/85480254-bf2e-47d3-91d1-0470723b6103)
 
 ## 2. User Story
