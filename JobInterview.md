@@ -47,17 +47,15 @@ Player | Masuk ke rumah | Bisa bereksplorasi | ⭐⭐⭐
 
 ## 3. Struktur Data
 
-Cara membuat aneka macam bentuk grafik menggunakan mermaid.js bisa lihat di [https://mermaid.js.org/syntax/entityRelationshipDiagram.html](https://mermaid.js.org/syntax/entityRelationshipDiagram.html) 
-
 ```mermaid
 erDiagram
-    RUJAK ||--o{ SAYUR : tersusun
-    PEMBELI ||--|{ RUJAK : beli
+   
+    Player ||--|{ Movement : input
 ```
 
 ## 4. Arsitektur Sistem
 
-Masih pake mermaid.js juga bisa lihat flowchart di [https://mermaid.js.org/syntax/flowchart.html](https://mermaid.js.org/syntax/flowchart.html)
+(https://mermaid.js.org/syntax/flowchart.html)
 
 ## 5. Teknologi, Library, dan Framework
 - Teknologi yang saya gunakan untuk membuat game yang satu ini adalah java
