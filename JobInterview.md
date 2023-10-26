@@ -29,6 +29,9 @@ Indie retro RPG
 
 ![pokemon-game-maker](https://github.com/fadligg/fadligg.github.io/assets/144420686/85480254-bf2e-47d3-91d1-0470723b6103)
 
+![42747c86db7ac0cd53797a635573a236-1200-80](https://github.com/fadligg/fadligg.github.io/assets/144420686/3161a71b-c90d-4ef6-a3a6-220f05790ea0)
+
+
 ## 2. User Story
 
 Sebagai | Saya Ingin Bisa | Sehingga | Prioritas
