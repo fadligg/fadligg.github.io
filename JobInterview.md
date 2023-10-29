@@ -42,6 +42,7 @@ Player | Berinteraksi dengan NPC | Bisa menyelesaikan quest yang diberi | ⭐⭐
 Player | Bermain dengan musik berjalan di background | Nuansa chill / anti-stress tercipta | ⭐⭐⭐⭐⭐
 Player | Menyimpan barang ke inventory | Bisa menyimpan barang | ⭐⭐⭐⭐
 Player | Menebang pohon | Menyelesaikan quest menebang pohon | ⭐⭐⭐
+Player | Memancing | Bisa tenang | ⭐⭐⭐
 Player | Save data | Data terakhir bisa tersimpan | ⭐⭐⭐
 Player | Load data | Memuat data terakhir | ⭐⭐⭐
 Player | Berpindah map | Bisa bereksplorasi | ⭐⭐⭐
@@ -52,8 +53,48 @@ Player | Masuk ke rumah | Bisa bereksplorasi | ⭐⭐⭐
 
 ```mermaid
 erDiagram
+    User ||--|{ Start : Mulai_Game
    
-    Player ||--|{ Movement : input
+    Start ||--|{ In-Game : User_In_The_Game
+    In-Game{
+png character
+png NPCs
+png object_tile
+png inventory
+txt map
+wav music
+}
+
+User ||--|{ Settings : Menyesuaikan
+    Settings{
+        checkbox fullscreen
+        slider music
+        slider sound_effect
+    }
+
+User ||--|{ Exit : Keluar_Game
+
+In-Game ||--|{ Jack : In-Game_Character
+In-Game ||--|{ NPCs: In-Game_NPCs
+In-Game ||--|{ Music: In-Game_Music
+Music {
+    wav background_music
+    wav sound_effect
+}
+In-Game ||--|{ object_tile: In-Game_Object
+object_tile{
+    png tree
+    png wall
+    png grass
+    png sand
+    png water
+    png door
+}
+
+
+  
+    
+
 ```
 
 ## 4. Arsitektur Sistem
