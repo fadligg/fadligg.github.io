@@ -105,7 +105,7 @@ flowchart TD
     A[Database : mySQL] <-->B[Web Application : Spring - Spring Boot]
     B <--> C[Web Server : Spring - Tomcat]
     C <--> D[Application Website PC : Spring - Java]
-   
+```
 
 ## 5. Teknologi, Library, dan Framework
 - Teknologi yang saya gunakan untuk membuat game yang satu ini adalah java
