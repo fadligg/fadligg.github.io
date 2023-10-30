@@ -108,9 +108,9 @@ flowchart TD
 ```
 
 ## 5. Teknologi, Library, dan Framework
-- Teknologi yang saya gunakan untuk membuat game yang satu ini adalah java
+- Teknologi yang saya gunakan untuk membuat game yang satu ini adalah IDE berupa Visual Studio Code dengan bahasa pemrograman java, database mySQL, Spring.
 - Library yang saya gunakan adalah Java Standard Libraries (Java Swing, Java awt, dsb.)
-- Framework yang akan saya gunakan adalah spring framework
+- Framework yang akan saya gunakan adalah Spring framework
 
 ## 6. Desain User Experience dan User Interface
 ![Start](https://github.com/fadligg/fadligg.github.io/assets/144420686/4f6b1e6e-22b7-413f-9b63-62eda599d444)
