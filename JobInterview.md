@@ -1,6 +1,7 @@
 # Game "Jack In The Woods"
 ## 1.1 Latar Belakang
   Banyaknya game yang saat ini dimainkan oleh banyak orang, sudah sangat modern atau sangat canggih dengan grafik yang memukau dengan jauhnya perkembangan zaman, game retro menghadirkan nuansa nostalgia pada pemainnya. Ditambah game yang dimainkan oleh orang orang saat ini terlalu penuh tekanan atau stress, game retro rpg ini membawakan perasaan anti-stress atau chill saat dimainkan.
+  Bisa dikatakan game ber-genre MOBA sudah sangat sering ditemukan di sekitar kita, baik di lingkungan universitas maupun di lingkungan masyarakat. Dan tidak sedikit dari mereka yang frustasi, stress dan istilahnya "terjebak" dalam game saat mengalami kekalahan yang beruntun dan sulit meraih kemenangan. Game ini bisa menghadirkan suasana baru bagi para gamers yang merasa butuh environtment atau lingkungan baru untuk beralih sejenak dari game yang dirasa terlalu stress.
 
 ## 1.2. Deksripsi Teknologi Informasi
   Game "Jack In The Woods" ini merupakan game retro rpg yang membawakan perasaan chill saat bermain dengan experience
@@ -21,7 +22,7 @@ Gaming and chill without stress
 - Pemain yang ingin bernostalgia dengan retro game
 - Penikmat game indie
 ### 1.3.4. Genre :
-Indie retro RPG
+Indie retro RPG, Simulation
 ### 1.3.5. Poster :
 ![poster](https://github.com/fadligg/fadligg.github.io/assets/144420686/04beebea-8cb0-4f53-b610-9910cbf0302d)
 ### 1.3.6 Inspirasi Design :
