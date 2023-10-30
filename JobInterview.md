@@ -1,7 +1,7 @@
 # Game "Jack In The Woods"
 ## 1.1 Latar Belakang
-  Banyaknya game yang saat ini dimainkan oleh banyak orang, sudah sangat modern atau sangat canggih dengan grafik yang memukau dengan jauhnya perkembangan zaman, game retro menghadirkan nuansa nostalgia pada pemainnya. Ditambah game yang dimainkan oleh orang orang saat ini terlalu penuh tekanan atau stress, game retro rpg ini membawakan perasaan anti-stress atau chill saat dimainkan.
-  Bisa dikatakan game ber-genre MOBA sudah sangat sering ditemukan di sekitar kita, baik di lingkungan universitas maupun di lingkungan masyarakat. Dan tidak sedikit dari mereka yang frustasi, stress dan istilahnya "terjebak" dalam game saat mengalami kekalahan yang beruntun dan sulit meraih kemenangan. Game ini bisa menghadirkan suasana baru bagi para gamers yang merasa butuh environtment atau lingkungan baru untuk beralih sejenak dari game yang dirasa terlalu stress.
+  <p> Banyaknya game yang saat ini dimainkan oleh banyak orang, sudah sangat modern atau sangat canggih dengan grafik yang memukau dengan jauhnya perkembangan zaman, game retro menghadirkan nuansa nostalgia pada pemainnya. Ditambah game yang dimainkan oleh orang orang saat ini terlalu penuh tekanan atau stress, game retro rpg ini membawakan perasaan anti-stress atau chill saat dimainkan. </p>
+ <p> Bisa dikatakan game ber-genre MOBA, FPS sudah sangat sering ditemukan di sekitar kita, baik di lingkungan universitas maupun di lingkungan masyarakat. Dan tidak sedikit dari mereka yang frustasi, stress dan istilahnya "terjebak" dalam game saat mengalami kekalahan yang beruntun dan sulit meraih kemenangan. Game ini bisa menghadirkan suasana baru bagi para gamers yang merasa butuh environtment atau lingkungan baru untuk beralih sejenak dari game yang dirasa terlalu stress.</p>
 
 ## 1.2. Deksripsi Teknologi Informasi
   Game "Jack In The Woods" ini merupakan game retro rpg yang membawakan perasaan chill saat bermain dengan experience
@@ -104,7 +104,7 @@ object_tile{
 
 ## 5. Teknologi, Library, dan Framework
 - Teknologi yang saya gunakan untuk membuat game yang satu ini adalah java
-- Library yang saya gunakan adalah Java Standard Libraries (Java Swing, Java awt)
+- Library yang saya gunakan adalah Java Standard Libraries (Java Swing, Java awt, dsb.)
 - Framework yang akan saya gunakan adalah spring framework
 
 ## 6. Desain User Experience dan User Interface
