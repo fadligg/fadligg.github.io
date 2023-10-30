@@ -18,9 +18,10 @@ Jack In The Woods
 Gaming and chill without stress
 ### 1.3.3. Target User :
 - Usia 15 tahun ke atas
-- Pemain yang mencari ketenangan saat bermain game
-- Pemain yang ingin bernostalgia dengan retro game
+- Gamer yang mencari ketenangan saat bermain game
+- Gamer yang ingin bernostalgia dengan retro game
 - Penikmat game indie
+- Gamer yang penat dengan game kompetitif
 ### 1.3.4. Genre :
 Indie retro RPG, Simulation
 ### 1.3.5. Poster :
