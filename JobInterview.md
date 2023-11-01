@@ -118,7 +118,7 @@ flowchart TD
 
 ## 7. Demonstrasi Video
 
-Link youtube nya
+[Link youtube nya](https://youtu.be/taWaZuo58I4)
 
 ## 8. Bagaimana mesin komputasi dan sistem operasi berperan dalam produk teknologi informasimu ?
 
