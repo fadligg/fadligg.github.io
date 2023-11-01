@@ -118,20 +118,20 @@ flowchart TD
 
 ## 7. Demonstrasi Video
 
-[Link youtube nya](https://youtu.be/taWaZuo58I4)
+[Link To My Youtube](https://youtu.be/taWaZuo58I4)
 
 ## 8. Bagaimana mesin komputasi dan sistem operasi berperan dalam produk teknologi informasimu ?
 
-Link youtube nya di detik jawaban ini
+[In Progress]
 
 ## 9. Bagaimana algoritma, struktur data, dan bahasa pemrograman berperan dalam produk teknologi informasimu ?
 
-Link youtube nya di detik jawaban ini
+[In Progress]
 
 ## 10. Bagaimana metode pengembangan perangkat lunak / Software Development Life Cycle berperan dalam produk teknologi informasimu ?
 
-Link youtube nya di detik jawaban ini
+[In Progress]
 
 ## 11. Bagaimana database / sistem basis data berperan dalam produk teknologi informasimu ?
 
-Link youtube nya di detik jawaban ini
+[In Progress]
