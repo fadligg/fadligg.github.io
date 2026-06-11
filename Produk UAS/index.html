@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AR Habit Garden</title>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.165.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.165.0/examples/jsm/"
+      }
+    }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:     #F7F3EC;
+      --parchment: #EDE6D8;
+      --sage:      #7D9B76;
+      --sage-dark: #4F7248;
+      --wood:      #A0714F;
+      --stone:     #8C8680;
+      --ink:       #2C2C2C;
+      --ink-light: #5C5750;
+      --red:       #C0513A;
+      --shadow:    rgba(44, 44, 44, 0.15);
+    }
+
+    html, body {
+      width: 100%; height: 100%;
+      overflow: hidden;
+      background: #1a1a1a;
+      font-family: 'Georgia', serif;
+    }
+
+    #three-canvas {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+
+    /* ── AR Button ── */
+    #ARButton {
+      position: fixed !important;
+      bottom: 28px !important;
+      left: 50% !important;
+      transform: translateX(-50%) !important;
+      z-index: 100 !important;
+      border: 2px solid var(--sage) !important;
+      background: rgba(247,243,236,0.92) !important;
+      color: var(--sage-dark) !important;
+      font-family: 'Georgia', serif !important;
+      font-size: 14px !important;
+      font-weight: bold !important;
+      letter-spacing: 0.08em !important;
+      padding: 12px 28px !important;
+      border-radius: 30px !important;
+      cursor: pointer !important;
+      backdrop-filter: blur(8px) !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.25) !important;
+      transition: background 0.2s, color 0.2s !important;
+    }
+    #ARButton:hover {
+      background: var(--sage) !important;
+      color: var(--cream) !important;
+    }
+
+    /* ── Overlay ── */
+    #overlay {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    /* ── Habit Panel ── */
+    #habit-panel {
+      position: absolute;
+      top: 14px; left: 12px;
+      width: min(280px, calc(100vw - 24px));
+      background: rgba(247, 243, 236, 0.95);
+      border: 1px solid var(--parchment);
+      border-radius: 16px;
+      padding: 10px 12px 10px;
+      box-shadow: 0 6px 20px var(--shadow);
+      backdrop-filter: blur(14px);
+      pointer-events: all;
+      max-height: calc(100vh - 110px);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    #habit-panel.collapsed {
+      max-height: 44px;
+    }
+    #habit-panel.collapsed .panel-body {
+      display: none;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--parchment);
+      margin-bottom: 8px;
+      flex-shrink: 0;
+      cursor: pointer;
+      user-select: none;
+      min-height: 28px;
+    }
+    #habit-panel.collapsed .panel-header {
+      padding-bottom: 0;
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .panel-icon { font-size: 16px; line-height: 1; }
+
+    .panel-title {
+      font-size: 12px; font-weight: bold;
+      color: var(--ink); letter-spacing: 0.03em;
+      flex: 1;
+    }
+
+    .panel-toggle {
+      font-size: 10px; color: var(--stone);
+      transition: transform 0.3s;
+      flex-shrink: 0;
+    }
+    #habit-panel.collapsed .panel-toggle {
+      transform: rotate(180deg);
+    }
+
+    .panel-subtitle {
+      font-size: 9.5px; color: var(--ink-light);
+      font-style: italic; margin-top: 1px;
+    }
+
+    /* ── Scrollable habit list ── */
+    .habit-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 2px;
+      max-height: 180px;
+    }
+
+    .habit-list::-webkit-scrollbar { width: 4px; }
+    .habit-list::-webkit-scrollbar-track { background: transparent; }
+    .habit-list::-webkit-scrollbar-thumb { background: var(--parchment); border-radius: 4px; }
+
+    .habit-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      background: var(--cream);
+      border: 1.5px solid var(--parchment);
+      border-radius: 13px;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      user-select: none;
+      flex-shrink: 0;
+    }
+
+    .habit-item:hover { border-color: var(--sage); box-shadow: 0 2px 10px rgba(125,155,118,0.18); }
+    .habit-item.completed { background: linear-gradient(135deg,#eaf4e8,#f0ebe0); border-color: var(--sage); }
+    .habit-item.planted   { background: linear-gradient(135deg,#d4eccc,#e8e0d4); border-color: var(--sage-dark); opacity: 0.72; cursor: default; }
+
+    .habit-checkbox {
+      width: 22px; height: 22px; min-width: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--parchment);
+      background: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .habit-item.completed .habit-checkbox { border-color: var(--sage); background: var(--sage); color: white; }
+    .habit-item.planted   .habit-checkbox { border-color: var(--sage-dark); background: var(--sage-dark); color: white; }
+
+    .habit-info { flex: 1; min-width: 0; }
+
+    .habit-name {
+      font-size: 11.5px; font-weight: bold; color: var(--ink);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .habit-item.completed .habit-name,
+    .habit-item.planted   .habit-name { text-decoration: line-through; color: var(--ink-light); }
+
+    .habit-meta {
+      display: flex; align-items: center; gap: 5px; margin-top: 3px;
+    }
+
+    .habit-type-badge {
+      font-size: 9px; font-weight: bold;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 1px 6px; border-radius: 6px;
+    }
+    .badge-rock { background: #e8e4e0; color: var(--stone); }
+    .badge-tree { background: #daecd6; color: var(--sage-dark); }
+    .badge-flower { background: #f5e4ef; color: #a0527a; }
+    .badge-mushroom { background: #faecd8; color: #b06820; }
+
+    .habit-status-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-pending   { background: var(--stone); opacity: 0.5; }
+    .dot-completed { background: var(--sage); }
+    .dot-planted   { background: var(--sage-dark); }
+
+    .habit-status-text {
+      font-size: 9px; color: var(--ink-light); font-style: italic;
+    }
+
+    .habit-badge { font-size: 16px; flex-shrink: 0; }
+
+    /* Delete button */
+    .habit-delete {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 1.5px solid #e0d8cc;
+      background: transparent;
+      color: var(--stone);
+      font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      line-height: 1;
+    }
+    .habit-delete:hover { background: var(--red); color: white; border-color: var(--red); }
+
+    /* Empty state */
+    .habit-empty {
+      text-align: center;
+      padding: 20px 0 10px;
+      color: var(--ink-light);
+      font-style: italic;
+      font-size: 12px;
+    }
+
+    /* ── Add Habit Form ── */
+    .add-section {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--parchment);
+      flex-shrink: 0;
+    }
+
+    .add-toggle-btn {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 7px;
+      border: 1.5px dashed var(--sage);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--sage-dark);
+      font-family: 'Georgia', serif;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.2s, border-style 0.2s;
+    }
+    .add-toggle-btn:hover { background: rgba(125,155,118,0.1); border-style: solid; }
+
+    /* Add form (hidden by default) */
+    .add-form {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .add-form.open { display: flex; }
+
+    .add-form input[type="text"] {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1.5px solid var(--parchment);
+      border-radius: 10px;
+      background: var(--cream);
+      font-family: 'Georgia', serif;
+      font-size: 13px;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .add-form input[type="text"]:focus { border-color: var(--sage); }
+    .add-form input[type="text"]::placeholder { color: var(--stone); font-style: italic; }
+
+    .type-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .type-option {
+      display: flex; align-items: center; gap: 7px;
+      padding: 8px 10px;
+      border: 1.5px solid var(--parchment);
+      border-radius: 10px;
+      background: var(--cream);
+      cursor: pointer;
+      font-size: 11.5px;
+      color: var(--ink-light);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .type-option:hover { border-color: var(--sage); }
+    .type-option.selected { border-color: var(--sage); background: #eaf4e8; color: var(--sage-dark); font-weight: bold; }
+    .type-option .type-icon { font-size: 16px; }
+
+    .form-actions {
+      display: flex; gap: 7px;
+    }
+
+    .btn-add {
+      flex: 1;
+      padding: 9px;
+      background: var(--sage);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Georgia', serif;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-add:hover { background: var(--sage-dark); }
+
+    .btn-cancel {
+      padding: 9px 14px;
+      background: var(--cream);
+      color: var(--ink-light);
+      border: 1.5px solid var(--parchment);
+      border-radius: 10px;
+      font-family: 'Georgia', serif;
+      font-size: 12px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .btn-cancel:hover { border-color: var(--stone); }
+
+    /* ── Summary bar ── */
+    .summary-bar {
+      display: flex; gap: 6px; margin-bottom: 8px; flex-shrink: 0;
+    }
+
+    .summary-chip {
+      flex: 1; text-align: center;
+      padding: 4px 2px;
+      border-radius: 8px;
+      font-size: 9px;
+      font-weight: bold;
+      letter-spacing: 0.03em;
+    }
+    .chip-total    { background: #f0ebe0; color: var(--ink-light); }
+    .chip-done     { background: #daecd6; color: var(--sage-dark); }
+    .chip-planted  { background: #c8e0c0; color: #3a6233; }
+
+    .summary-chip span { display: block; font-size: 13px; font-weight: bold; margin-bottom: 1px; }
+
+    /* ── AR Hint ── */
+    #ar-hint {
+      position: absolute;
+      bottom: 90px; left: 50%; transform: translateX(-50%);
+      background: rgba(247,243,236,0.92);
+      color: var(--ink);
+      font-size: 12px; font-style: italic;
+      padding: 9px 18px;
+      border-radius: 20px;
+      border: 1px solid var(--parchment);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px var(--shadow);
+      pointer-events: none;
+      white-space: nowrap;
+      opacity: 0; transition: opacity 0.4s;
+    }
+    #ar-hint.visible { opacity: 1; }
+
+    /* ── Legend ── */
+    #legend {
+      position: absolute;
+      bottom: 90px; right: 16px;
+      background: rgba(247,243,236,0.88);
+      border: 1px solid var(--parchment);
+      border-radius: 14px;
+      padding: 10px 13px;
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+      box-shadow: 0 4px 16px var(--shadow);
+    }
+    .legend-title { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--stone); margin-bottom: 6px; }
+    .legend-row   { display: flex; align-items: center; gap: 7px; margin-bottom: 4px; font-size: 10px; color: var(--ink-light); }
+    .legend-dot   { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Background message ── */
+    #bg-message {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      text-align: center; color: rgba(247,243,236,0.45);
+      pointer-events: none;
+    }
+    #bg-message h2 { font-size: 20px; font-weight: normal; letter-spacing: 0.06em; margin-bottom: 8px; }
+    #bg-message p  { font-size: 12px; font-style: italic; opacity: 0.7; }
+    body.ar-active #bg-message { display: none; }
+
+    @media (max-width: 400px) {
+      #habit-panel { top: 12px; left: 8px; width: calc(100vw - 16px); }
+    }
+
+    /* ── Plant Info Popup ── */
+    #plant-popup {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      width: min(260px, calc(100vw - 40px));
+      background: rgba(247, 243, 236, 0.97);
+      border: 1px solid var(--parchment);
+      border-radius: 18px;
+      padding: 16px 18px 14px;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.22);
+      backdrop-filter: blur(16px);
+      pointer-events: all;
+      opacity: 0;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 60;
+    }
+    #plant-popup.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .popup-close {
+      position: absolute;
+      top: 10px; right: 12px;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid var(--parchment);
+      background: var(--cream);
+      color: var(--stone);
+      font-size: 11px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .popup-close:hover { background: var(--red); color: white; border-color: var(--red); }
+
+    .popup-icon {
+      font-size: 32px;
+      text-align: center;
+      margin-bottom: 8px;
+      line-height: 1;
+    }
+
+    .popup-habit-name {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--ink);
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    .popup-divider {
+      border: none;
+      border-top: 1px solid var(--parchment);
+      margin: 8px 0;
+    }
+
+    .popup-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--ink-light);
+      margin-bottom: 5px;
+    }
+    .popup-row:last-child { margin-bottom: 0; }
+
+    .popup-row-icon { font-size: 13px; flex-shrink: 0; width: 18px; text-align: center; }
+
+    .popup-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: bold;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .tag-rock     { background: #e8e4e0; color: var(--stone); }
+    .tag-tree     { background: #daecd6; color: var(--sage-dark); }
+    .tag-flower   { background: #f5e4ef; color: #a0527a; }
+    .tag-mushroom { background: #faecd8; color: #b06820; }
+
+    .popup-planted-label {
+      text-align: center;
+      font-size: 10px;
+      color: var(--sage-dark);
+      font-style: italic;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--parchment);
+    }
+    
+    /* ── Login Overlay ── */
+    #login-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: var(--cream);
+      z-index: 200; /* Berada di atas semua elemen UI dan AR Button */
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.5s ease;
+    }
+    #login-overlay.hidden {
+      opacity: 0; pointer-events: none;
+    }
+    .login-box {
+      background: rgba(255,255,255,0.85);
+      padding: 30px; border-radius: 20px;
+      border: 1px solid var(--parchment);
+      box-shadow: 0 10px 30px var(--shadow);
+      text-align: center; backdrop-filter: blur(10px);
+      width: 90%; max-width: 320px;
+    }
+    .login-box h2 { font-size: 22px; color: var(--sage-dark); margin-bottom: 8px; }
+    .login-box p { font-size: 13px; color: var(--ink-light); margin-bottom: 24px; font-style: italic; }
+    .login-box input {
+      width: 100%; padding: 12px; border: 1.5px solid var(--parchment);
+      border-radius: 12px; font-family: 'Georgia', serif; font-size: 14px;
+      margin-bottom: 16px; outline: none; text-align: center;
+      background: var(--cream);
+    }
+    .login-box input:focus { border-color: var(--sage); }
+    .login-box button {
+      width: 100%; padding: 12px; background: var(--sage);
+      color: white; border: none; border-radius: 12px;
+      font-family: 'Georgia', serif; font-size: 14px; font-weight: bold;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .login-box button:hover { background: var(--sage-dark); }
+
+    /* ── History Modal ── */
+    #history-modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4); z-index: 150;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: all;
+    }
+    .history-box {
+      background: var(--cream); width: 90%; max-width: 340px;
+      border-radius: 18px; border: 1px solid var(--parchment);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      padding: 16px; display: flex; flex-direction: column; max-height: 70vh;
+    }
+    .history-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 10px; border-bottom: 1px solid var(--parchment);
+      margin-bottom: 10px;
+    }
+    .history-header h3 { font-size: 14px; color: var(--ink); }
+    #btn-close-history {
+      background: transparent; border: none; font-size: 14px; color: var(--stone); cursor: pointer;
+    }
+    .history-body {
+      overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;
+    }
+    .history-body::-webkit-scrollbar { width: 4px; }
+    .history-body::-webkit-scrollbar-thumb { background: var(--parchment); border-radius: 4px; }
+    
+    .history-log-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; background: white; border-radius: 10px;
+      border: 1px solid var(--parchment); font-size: 11.5px;
+    }
+    .history-log-info { flex: 1; }
+    .history-log-name { font-weight: bold; color: var(--ink); }
+    .history-log-time { font-size: 9px; color: var(--stone); font-style: italic; margin-top: 2px; }
+    .history-empty { text-align: center; color: var(--stone); font-style: italic; padding: 20px 0; font-size: 12px; }
+  </style>
+</head>
+<body>
+<div id="login-overlay">
+  <div class="login-box">
+    <h2>🌱 Habit Garden</h2>
+    <p>Who is planting today?</p>
+    <input type="text" id="username-input" placeholder="Enter your name" autocomplete="off" />
+    <button id="btn-login">Enter Garden</button>
+  </div>
+</div>
+
+<canvas id="three-canvas"></canvas>
+
+<div id="history-modal" style="display: none;">
+    <div class="history-box">
+      <div class="history-header">
+        <h3>📜 Planting History</h3>
+        <button id="btn-close-history">✕</button>
+      </div>
+      <div class="history-body" id="history-content">
+        </div>
+    </div>
+  </div>
+
+<div id="overlay">
+
+  <div id="bg-message">
+    <h2>🌱 Habit Garden</h2>
+    <p>Add habits below, then tap "Enter AR" to plant them</p>
+  </div>
+
+  <!-- ── Main Panel ── -->
+  <div id="habit-panel">
+
+    <!-- Header -->
+    <div class="panel-header" id="panel-header">
+      <span class="panel-icon">🌿</span>
+      <div style="flex:1">
+        <div class="panel-title">Today's Garden</div>
+        <div class="panel-subtitle" id="date-label"></div>
+      </div>
+      <span class="panel-toggle">▲</span>
+    </div>
+
+    <!-- Collapsible body -->
+    <div class="panel-body">
+
+    <!-- Summary -->
+    <div class="summary-bar" id="summary-bar">
+      <div class="summary-chip chip-total"><span id="count-total">0</span>Total</div>
+      <div class="summary-chip chip-done"><span id="count-done">0</span>Done</div>
+      <div class="summary-chip chip-planted"><span id="count-planted">0</span>Planted</div>
+    </div>
+
+    <!-- Habit list -->
+    <div class="habit-list" id="habit-list"></div>
+
+    <!-- Add section -->
+    <div class="add-section">
+      <button class="add-toggle-btn" id="add-toggle-btn">＋ Add New Habit</button>
+
+      <div class="add-form" id="add-form">
+        <input type="text" id="new-habit-name" placeholder="Habit name (e.g. Drink Water)" maxlength="40" />
+
+        <div class="type-selector" id="type-selector">
+          <div class="type-option selected" data-type="rock">
+            <span class="type-icon">🪨</span> Rock
+          </div>
+          <div class="type-option" data-type="tree">
+            <span class="type-icon">🌲</span> Tree
+          </div>
+          <div class="type-option" data-type="flower">
+            <span class="type-icon">🌸</span> Flower
+          </div>
+          <div class="type-option" data-type="mushroom">
+            <span class="type-icon">🍄</span> Mushroom
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-add" id="btn-add-habit">Plant It</button>
+          <button class="btn-cancel" id="btn-cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /.panel-body -->
+
+  </div>
+
+  <!-- Plant Info Popup -->
+  <div id="plant-popup">
+    <button class="popup-close" id="popup-close">✕</button>
+    <div class="popup-icon" id="popup-icon">🪨</div>
+    <div class="popup-habit-name" id="popup-name">Habit Name</div>
+    <hr class="popup-divider">
+    <div class="popup-row">
+      <span class="popup-row-icon">🌿</span>
+      <span>Object: <span id="popup-type-tag" class="popup-tag">Rock</span></span>
+    </div>
+    <div class="popup-row">
+      <span class="popup-row-icon">📅</span>
+      <span id="popup-date">Planted today</span>
+    </div>
+    <div class="popup-row">
+      <span class="popup-row-icon">✅</span>
+      <span id="popup-status">Completed &amp; Planted</span>
+    </div>
+    <div class="popup-planted-label">🌱 Growing in your garden</div>
+  </div>
+
+  <div id="ar-hint">☝️ Tap on a surface to plant your habit</div>
+
+  <div id="legend">
+    <div class="legend-title">AR Objects</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#8C8680"></div>Rock</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#4F7248"></div>Tree</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#d48aab"></div>Flower</div>
+    <div class="legend-row"><div class="legend-dot" style="background:#c87830"></div>Mushroom</div>
+  </div>
+
+</div>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { ARButton } from 'three/addons/webxr/ARButton.js';
+
+  /* ═══════════════════════════════════════════════════
+     1. HABIT STATE & USER LOGIN
+  ═══════════════════════════════════════════════════ */
+  const OBJECT_TYPES = {
+    rock:     { label: 'Rock',     badge: '🪨', badgeClass: 'badge-rock' },
+    tree:     { label: 'Tree',     badge: '🌲', badgeClass: 'badge-tree' },
+    flower:   { label: 'Flower',   badge: '🌸', badgeClass: 'badge-flower' },
+    mushroom: { label: 'Mushroom', badge: '🍄', badgeClass: 'badge-mushroom' },
+  };
+
+  let currentUser = null;
+  let habits = []; // Dikosongkan di awal, akan diisi setelah login
+
+  function uid() {
+    return Math.random().toString(36).slice(2, 9);
+  }
+
+  // Modifikasi load data berdasarkan username
+  function loadHabits(username) {
+    const key = `ar_habit_${username}`;
+    const storedData = localStorage.getItem(key);
+    if (storedData) {
+      const parsed = JSON.parse(storedData);
+      return parsed.map(h => {
+        if (h.plantedAt) h.plantedAt = new Date(h.plantedAt);
+        return h;
+      });
+    }
+    return []; // Jika user baru, kembalikan array kosong
+  }
+
+  // Modifikasi save data berdasarkan username
+  function saveHabitsToStorage() {
+    if (!currentUser) return; // Jangan simpan jika belum ada user yang login
+    const key = `ar_habit_${currentUser}`;
+    localStorage.setItem(key, JSON.stringify(habits));
+  }
+  let historyLog = []; // Array untuk menampung riwayat tanaman
+
+  function loadHistory(username) {
+    const key = `ar_history_${username}`;
+    const storedData = localStorage.getItem(key);
+    if (storedData) {
+      const parsed = JSON.parse(storedData);
+      return parsed.map(item => {
+        item.plantedAt = new Date(item.plantedAt);
+        return item;
+      });
+    }
+    return [];
+  }
+
+  function saveHistoryToStorage() {
+    if (!currentUser) return;
+    const key = `ar_history_${currentUser}`;
+    localStorage.setItem(key, JSON.stringify(historyLog));
+  }
+  
+
+  /* ── Login Logic ── */
+  const loginInput = document.getElementById('username-input');
+  const loginBtn = document.getElementById('btn-login');
+  
+  function handleLogin() {
+    const username = loginInput.value.trim();
+    if (!username) {
+      loginInput.style.borderColor = 'var(--red)';
+      loginInput.focus();
+      return;
+    }
+    
+    // Set user aktif dan muat datanya
+    currentUser = username;
+    habits = loadHabits(currentUser);
+    historyLog = loadHistory(currentUser);
+    
+    // Update UI title agar lebih personal
+    document.querySelector('.panel-title').textContent = `${currentUser}'s Garden`;
+    
+    // Render ulang data milik user tersebut dan hilangkan overlay
+    renderHabits();
+    document.getElementById('login-overlay').classList.add('hidden');
+  }
+
+  loginBtn.addEventListener('click', handleLogin);
+  loginInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleLogin();
+  });
+
+  /* ═══════════════════════════════════════════════════
+     2. DOM SETUP
+  ═══════════════════════════════════════════════════ */
+  document.getElementById('date-label').textContent = new Date().toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric'
+  });
+
+  /* ── Render habits ── */
+  function renderHabits() {
+    saveHabitsToStorage();
+
+    const list = document.getElementById('habit-list');
+    list.innerHTML = '';
+
+    if (habits.length === 0) {
+      list.innerHTML = '<div class="habit-empty">No habits yet.<br>Add one below! 🌱</div>';
+    }
+
+    habits.forEach(h => {
+      const type = OBJECT_TYPES[h.objectType] || OBJECT_TYPES.rock;
+
+      const dotClass  = `dot-${h.status}`;
+      const checkMark = h.status === 'pending' ? '' : h.status === 'completed' ? '✓' : '🌱';
+      const statusTxt = h.status === 'pending'   ? 'pending' :
+                        h.status === 'completed' ? 'done — tap in AR' : 'planted ✓';
+
+      const item = document.createElement('div');
+      item.className = `habit-item ${h.status === 'pending' ? '' : h.status}`;
+      item.dataset.id = h.id;
+
+      item.innerHTML = `
+        <div class="habit-checkbox">${checkMark}</div>
+        <div class="habit-info">
+          <div class="habit-name">${escHtml(h.name)}</div>
+          <div class="habit-meta">
+            <span class="habit-type-badge ${type.badgeClass}">${type.label}</span>
+            <span class="habit-status-dot ${dotClass}"></span>
+            <span class="habit-status-text">${statusTxt}</span>
+          </div>
+        </div>
+        <div class="habit-badge">${type.badge}</div>
+        ${h.status === 'pending' ? `<button class="habit-delete" data-del="${h.id}" title="Remove">✕</button>` : ''}
+      `;
+
+      // Mark done on click (not on delete button)
+      if (h.status === 'pending') {
+        item.addEventListener('click', (e) => {
+          if (e.target.closest('.habit-delete')) return;
+          markHabitDone(h.id);
+        });
+      }
+
+      list.appendChild(item);
+    });
+
+    // Delete buttons
+    list.querySelectorAll('.habit-delete').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteHabit(btn.dataset.del);
+      });
+    });
+
+    updateSummary();
+  }
+
+  function updateSummary() {
+    document.getElementById('count-total').textContent   = habits.length;
+    document.getElementById('count-done').textContent    = habits.filter(h => h.status === 'completed').length;
+    document.getElementById('count-planted').textContent = habits.filter(h => h.status === 'planted').length;
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function markHabitDone(id) {
+    const h = habits.find(x => x.id === id);
+    if (!h || h.status !== 'pending') return;
+    h.status = 'completed';
+    renderHabits();
+    showHint('☝️ Tap a surface in AR to plant your habit!');
+  }
+
+  function deleteHabit(id) {
+    habits = habits.filter(x => x.id !== id);
+    renderHabits();
+  }
+
+  renderHabits();
+
+  /* ── Collapse toggle ── */
+  document.getElementById('panel-header').addEventListener('click', () => {
+    document.getElementById('habit-panel').classList.toggle('collapsed');
+  });
+
+  /* ── Add habit form ── */
+  let selectedType = 'rock';
+
+  document.getElementById('add-toggle-btn').addEventListener('click', () => {
+    const form = document.getElementById('add-form');
+    const btn  = document.getElementById('add-toggle-btn');
+    const isOpen = form.classList.toggle('open');
+    btn.textContent = isOpen ? '✕ Close' : '＋ Add New Habit';
+    if (isOpen) document.getElementById('new-habit-name').focus();
+  });
+
+  document.getElementById('btn-cancel').addEventListener('click', closeForm);
+
+  document.getElementById('type-selector').addEventListener('click', (e) => {
+    const opt = e.target.closest('.type-option');
+    if (!opt) return;
+    selectedType = opt.dataset.type;
+    document.querySelectorAll('.type-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+  });
+
+  document.getElementById('btn-add-habit').addEventListener('click', addHabit);
+
+  document.getElementById('new-habit-name').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') addHabit();
+  });
+
+  function addHabit() {
+    const input = document.getElementById('new-habit-name');
+    const name  = input.value.trim();
+    if (!name) { input.focus(); input.style.borderColor = 'var(--red)'; return; }
+    input.style.borderColor = '';
+
+    habits.push({ id: uid(), name, objectType: selectedType, status: 'pending' });
+    input.value = '';
+    renderHabits();
+    closeForm();
+    showHint(`✅ "${name}" added to your garden list!`, 2500);
+  }
+
+  function closeForm() {
+    document.getElementById('add-form').classList.remove('open');
+    document.getElementById('add-toggle-btn').textContent = '＋ Add New Habit';
+  }
+
+  /* ═══════════════════════════════════════════════════
+     3. HINT HELPER
+  ═══════════════════════════════════════════════════ */
+  let hintTimer = null;
+  function showHint(msg, duration = 4000) {
+    const el = document.getElementById('ar-hint');
+    el.textContent = msg;
+    el.classList.add('visible');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => el.classList.remove('visible'), duration);
+  }
+
+  /* ═══════════════════════════════════════════════════
+     4. THREE.JS SCENE
+  ═══════════════════════════════════════════════════ */
+  const canvas = document.getElementById('three-canvas');
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.xr.enabled = true;
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.01, 20);
+
+  const ambient  = new THREE.AmbientLight(0xfff8f0, 1.4);
+  scene.add(ambient);
+
+  const dirLight = new THREE.DirectionalLight(0xffeedd, 2.2);
+  dirLight.position.set(1.5, 3, 2);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.set(1024, 1024);
+  scene.add(dirLight);
+
+  const arBtn = ARButton.createButton(renderer, {
+    requiredFeatures: ['hit-test'],
+    optionalFeatures: ['dom-overlay'],
+    domOverlay: { root: document.getElementById('overlay') }
+  });
+  arBtn.id = 'ARButton';
+  document.body.appendChild(arBtn);
+
+  /* ═══════════════════════════════════════════════════
+     5. RETICLE
+  ═══════════════════════════════════════════════════ */
+  const reticleGeom = new THREE.RingGeometry(0.06, 0.09, 32);
+  reticleGeom.rotateX(-Math.PI / 2);
+  const reticle = new THREE.Mesh(reticleGeom, new THREE.MeshStandardMaterial({
+    color: 0x7D9B76, roughness: 0.8, side: THREE.DoubleSide
+  }));
+  reticle.matrixAutoUpdate = false;
+  reticle.visible = false;
+  scene.add(reticle);
+
+  /* ═══════════════════════════════════════════════════
+     6. 3D OBJECT FACTORIES
+  ═══════════════════════════════════════════════════ */
+  function createRock() {
+    const g = new THREE.DodecahedronGeometry(0.07, 0);
+    g.scale(0.9 + Math.random()*0.2, 0.75 + Math.random()*0.2, 0.9 + Math.random()*0.2);
+    const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color: 0x8C8680, roughness: 0.9, metalness: 0.05 }));
+    m.castShadow = true; m.position.y = 0.055;
+    return m;
+  }
+
+  function createTree() {
+    const group = new THREE.Group();
+    const trunk = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.018, 0.025, 0.12, 8),
+      new THREE.MeshStandardMaterial({ color: 0xA0714F, roughness: 0.95 })
+    );
+    trunk.position.y = 0.06; trunk.castShadow = true;
+    group.add(trunk);
+
+    const canopy = new THREE.Mesh(
+      new THREE.ConeGeometry(0.1, 0.22, 8),
+      new THREE.MeshStandardMaterial({ color: 0x4F7248, roughness: 0.85 })
+    );
+    canopy.position.y = 0.12 + 0.11 + 0.01; canopy.castShadow = true;
+    group.add(canopy);
+    return group;
+  }
+
+  function createFlower() {
+    const group = new THREE.Group();
+
+    // Stem
+    const stem = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.006, 0.008, 0.12, 6),
+      new THREE.MeshStandardMaterial({ color: 0x5a8a4a, roughness: 0.9 })
+    );
+    stem.position.y = 0.06;
+    group.add(stem);
+
+    // Centre
+    const centre = new THREE.Mesh(
+      new THREE.SphereGeometry(0.025, 8, 8),
+      new THREE.MeshStandardMaterial({ color: 0xf5c842, roughness: 0.8 })
+    );
+    centre.position.y = 0.13;
+    group.add(centre);
+
+    // Petals (6 elongated spheres around centre)
+    const petalMat = new THREE.MeshStandardMaterial({ color: 0xd48aab, roughness: 0.7 });
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const petal = new THREE.Mesh(new THREE.SphereGeometry(0.018, 6, 6), petalMat);
+      petal.position.set(Math.cos(angle)*0.045, 0.13, Math.sin(angle)*0.045);
+      petal.scale.set(1, 0.5, 1);
+      group.add(petal);
+    }
+    return group;
+  }
+
+  function createMushroom() {
+    const group = new THREE.Group();
+
+    // Stalk
+    const stalk = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.02, 0.025, 0.08, 8),
+      new THREE.MeshStandardMaterial({ color: 0xf0e8d8, roughness: 0.9 })
+    );
+    stalk.position.y = 0.04;
+    group.add(stalk);
+
+    // Cap
+    const cap = new THREE.Mesh(
+      new THREE.SphereGeometry(0.07, 10, 6, 0, Math.PI*2, 0, Math.PI/2),
+      new THREE.MeshStandardMaterial({ color: 0xc87830, roughness: 0.85 })
+    );
+    cap.position.y = 0.08;
+    group.add(cap);
+
+    // White dots on cap
+    const dotMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 });
+    [[0,0.07,0.04],[0.04,0.065,0.03],[-0.03,0.065,0.04],[0.02,0.07,-0.04]].forEach(([x,y,z]) => {
+      const dot = new THREE.Mesh(new THREE.SphereGeometry(0.008, 5, 5), dotMat);
+      dot.position.set(x, y + 0.08, z);
+      group.add(dot);
+    });
+    return group;
+  }
+
+  function createObjectForHabit(habit) {
+    switch (habit.objectType) {
+      case 'rock':     return createRock();
+      case 'tree':     return createTree();
+      case 'flower':   return createFlower();
+      case 'mushroom': return createMushroom();
+      default:         return createRock();
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════
+     7. HIT TEST
+  ═══════════════════════════════════════════════════ */
+  let hitTestSource = null, hitTestSourceReady = false;
+
+  renderer.xr.addEventListener('sessionstart', async () => {
+    document.body.classList.add('ar-active');
+    showHint('🔍 Move your phone to detect a surface…', 5000);
+
+    const session    = renderer.xr.getSession();
+    const viewerRef  = await session.requestReferenceSpace('viewer');
+    hitTestSource    = await session.requestHitTestSource({ space: viewerRef });
+    hitTestSourceReady = true;
+
+    session.addEventListener('end', () => {
+      hitTestSourceReady = false;
+      hitTestSource = null;
+      document.body.classList.remove('ar-active');
+    });
+  });
+
+  /* ═══════════════════════════════════════════════════
+     8. TAP TO PLANT
+  ═══════════════════════════════════════════════════ */
+  const controller = renderer.xr.getController(0);
+  controller.addEventListener('select', onSelect);
+  scene.add(controller);
+
+  // Registry: three object → habit data
+  const plantedRegistry = new Map();
+  const growingObjects = [];
+
+
+  function onSelect() {
+    // If a popup is open, close it first and treat tap as dismiss
+    if (document.getElementById('plant-popup').classList.contains('visible')) {
+      closePlantPopup();
+      return;
+    }
+
+    // Raycast: check if tap hits an existing planted object
+    if (renderer.xr.isPresenting) {
+      const xrCamera = renderer.xr.getCamera();
+      const raycaster = new THREE.Raycaster();
+      // Cast ray from center of view
+      raycaster.setFromCamera(new THREE.Vector2(0, 0), xrCamera);
+      const plantedMeshes = [...plantedRegistry.keys()];
+      // Collect all child meshes too (Groups)
+      const allMeshes = [];
+      plantedMeshes.forEach(obj => {
+        if (obj.isMesh) allMeshes.push(obj);
+        obj.traverse(c => { if (c.isMesh) allMeshes.push(c); });
+      });
+      const hits = raycaster.intersectObjects(allMeshes, false);
+      if (hits.length > 0) {
+        // Find which root object was hit
+        const hitObj = hits[0].object;
+        let root = hitObj;
+        plantedRegistry.forEach((_, key) => {
+          if (key === hitObj) root = key;
+          key.traverse(c => { if (c === hitObj) root = key; });
+        });
+        const habitData = plantedRegistry.get(root);
+        if (habitData) { showPlantPopup(habitData); return; }
+      }
+    }
+
+    // Otherwise plant a new one
+    if (!reticle.visible) return;
+    const toPlant = habits.find(h => h.status === 'completed');
+    if (!toPlant) { showHint('✅ No completed habits to plant!'); return; }
+
+    const obj = createObjectForHabit(toPlant);
+    obj.applyMatrix4(reticle.matrix);
+
+    obj.scale.set(0, 0, 0);
+    // Simpan target scale di userData
+    obj.userData.targetScale = new THREE.Vector3(1, 1, 1);
+    growingObjects.push(obj);
+
+    scene.add(obj);
+
+    // Register with timestamp
+    toPlant.plantedAt = new Date();
+    plantedRegistry.set(obj, { ...toPlant });
+
+    historyLog.push({
+      id: uid(),
+      name: toPlant.name,
+      objectType: toPlant.objectType,
+      plantedAt: toPlant.plantedAt
+    });
+    saveHistoryToStorage();
+
+    toPlant.status = 'planted';
+    renderHabits();
+    showHint(`🌱 "${toPlant.name}" planted! Tap it to inspect.`, 3000);
+  }
+
+  /* ── Popup logic ── */
+  const BADGES = { rock:'🪨', tree:'🌲', flower:'🌸', mushroom:'🍄' };
+  const TAG_CLASS = { rock:'tag-rock', tree:'tag-tree', flower:'tag-flower', mushroom:'tag-mushroom' };
+
+  function showPlantPopup(habit) {
+    const type = OBJECT_TYPES[habit.objectType] || OBJECT_TYPES.rock;
+    const now  = habit.plantedAt
+      ? habit.plantedAt.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' })
+      : 'today';
+
+    document.getElementById('popup-icon').textContent   = BADGES[habit.objectType] || '🪨';
+    document.getElementById('popup-name').textContent   = habit.name;
+    document.getElementById('popup-date').textContent   = `Planted at ${now}`;
+    document.getElementById('popup-status').textContent = 'Completed & Planted ✓';
+
+    const tag = document.getElementById('popup-type-tag');
+    tag.textContent  = type.label;
+    tag.className    = `popup-tag ${TAG_CLASS[habit.objectType] || 'tag-rock'}`;
+
+    document.getElementById('plant-popup').classList.add('visible');
+  }
+
+  function closePlantPopup() {
+    document.getElementById('plant-popup').classList.remove('visible');
+  }
+
+  document.getElementById('popup-close').addEventListener('click', closePlantPopup);
+
+  /* ═══════════════════════════════════════════════════
+     9. RESIZE + RENDER LOOP
+  ═══════════════════════════════════════════════════ */
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  renderer.setAnimationLoop((_, frame) => {
+    if (frame && hitTestSourceReady) {
+      const refSpace   = renderer.xr.getReferenceSpace();
+      const hits       = frame.getHitTestResults(hitTestSource);
+      const hasPending = habits.some(h => h.status === 'completed');
+
+      if (hits.length > 0 && hasPending) {
+        const pose = hits[0].getPose(refSpace);
+        reticle.visible = true;
+        reticle.matrix.fromArray(pose.transform.matrix);
+      } else {
+        reticle.visible = false;
+      }
+    }
+
+    for (let i = growingObjects.length - 1; i >= 0; i--) {
+      const obj = growingObjects[i];
+      
+      // Lerp mendekati target scale (angka 0.1 adalah kecepatan animasi)
+      obj.scale.lerp(obj.userData.targetScale, 0.1);
+      
+      // Tambahkan efek putaran kecil saat tumbuh
+      obj.rotation.y += 0.08;
+
+      // Jika ukuran sudah hampir mencapai 100%, hentikan animasi
+      if (obj.scale.distanceTo(obj.userData.targetScale) < 0.005) {
+        obj.scale.copy(obj.userData.targetScale);
+        growingObjects.splice(i, 1); // Hapus dari array animasi
+      }
+    }
+    renderer.render(scene, camera);
+  });
+  /* ── History Modal Logic ── */
+  const historyModal = document.getElementById('history-modal');
+  const historyContent = document.getElementById('history-content');
+  const openHistoryBtn = document.getElementById('btn-open-history');
+  const closeHistoryBtn = document.getElementById('btn-close-history');
+
+  function renderHistory() {
+    historyContent.innerHTML = '';
+    
+    if (historyLog.length === 0) {
+      historyContent.innerHTML = '<div class="history-empty">No history recorded yet.<br>Plant some habits in AR! 🌿</div>';
+      return;
+    }
+
+    // Urutkan dari yang paling baru ditanam
+    const sortedHistory = [...historyLog].sort((a, b) => b.plantedAt - a.plantedAt);
+
+    sortedHistory.forEach(item => {
+      const type = OBJECT_TYPES[item.objectType] || OBJECT_TYPES.rock;
+      const timeStr = item.plantedAt.toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric'
+      }) + ' ' + item.plantedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+      const div = document.createElement('div');
+      div.className = 'history-log-item';
+      div.innerHTML = `
+        <div style="font-size: 18px;">${type.badge}</div>
+        <div class="history-log-info">
+          <div class="history-log-name">${escHtml(item.name)}</div>
+          <div class="history-log-time">Planted on ${timeStr}</div>
+        </div>
+      `;
+      historyContent.add(div);
+    });
+  }
+
+  openHistoryBtn.addEventListener('click', (e) => {
+    e.stopPropagation(); // Mencegah pemicu collapse panel header
+    renderHistory();
+    historyModal.style.display = 'flex';
+  });
+
+  closeHistoryBtn.addEventListener('click', () => {
+    historyModal.style.display = 'none';
+  });
+
+  // Tutup modal jika user klik di luar kotak putih history
+  historyModal.addEventListener('click', (e) => {
+    if (e.target === historyModal) historyModal.style.display = 'none';
+  });
+</script>
+
+</body>
+</html>
