@@ -1,0 +1,915 @@
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+  @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css'); /* Added for icons to work standalone */
+
+  :root {
+    /* Color Palette - Modern SaaS Professional */
+    --primary: #4F46E5;        /* Indigo 600 */
+    --primary-hover: #4338CA;  /* Indigo 700 */
+    --primary-light: #EEEDFD;
+    --secondary: #0D9488;      /* Teal 600 */
+    --secondary-light: #CCFBF1;
+    --accent: #F59E0B;         /* Amber 500 */
+    --accent-light: #FEF3C7;
+    
+    --bg-main: #F8FAFC;        /* Slate 50 */
+    --bg-card: #FFFFFF;
+    --text-dark: #0F172A;      /* Slate 900 */
+    --text-muted: #64748B;     /* Slate 500 */
+    --border-light: #E2E8F0;   /* Slate 200 */
+    
+    --radius-md: 12px;
+    --radius-lg: 20px;
+    --radius-xl: 32px;
+    
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+    --shadow-hover: 0 20px 25px -5px rgb(0 0 0 / 0.05), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { background-color: var(--bg-main); } /* Optional for full page view */
+
+  .voc-wrap {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: var(--text-dark);
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: var(--bg-main);
+    min-height: 100vh;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulseGlow {
+    0% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4); }
+    70% { box-shadow: 0 0 0 15px rgba(79, 70, 229, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0); }
+  }
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  @keyframes slideInRight {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .stagger-1 { animation-delay: 0.1s !important; }
+  .stagger-2 { animation-delay: 0.2s !important; }
+  .stagger-3 { animation-delay: 0.3s !important; }
+  .stagger-4 { animation-delay: 0.4s !important; }
+
+  /* NAVIGATION */
+  .nav-container {
+    background: var(--bg-card);
+    padding: 0.75rem;
+    border-radius: 100px;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-light);
+    margin-bottom: 2rem;
+    position: sticky;
+    top: 1rem;
+    z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.9);
+  }
+
+  .nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav button {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 100px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav button:hover {
+    color: var(--primary);
+    background: var(--primary-light);
+  }
+
+  .nav button.active {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    transform: translateY(-1px);
+  }
+
+  /* SECTIONS */
+  .section { 
+    display: none; 
+    animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .section.active { display: block; }
+  
+  /* Shared section elements */
+  .sec-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-dark);
+    margin: 2rem 0 1.25rem;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .sec-title::before {
+    content: '';
+    display: block;
+    width: 6px;
+    height: 24px;
+    background: var(--primary);
+    border-radius: 4px;
+  }
+
+  /* HERO */
+  .hero-card {
+    background: linear-gradient(135deg, var(--text-dark) 0%, var(--primary) 50%, var(--secondary) 100%);
+    border-radius: var(--radius-xl);
+    padding: 3.5rem 3rem;
+    color: white;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+  }
+
+  .hero-card::before, .hero-card::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(40px);
+    z-index: 0;
+  }
+  .hero-card::before {
+    width: 300px; height: 300px;
+    background: rgba(79, 70, 229, 0.4);
+    top: -100px; right: -50px;
+    animation: float 6s ease-in-out infinite;
+  }
+  .hero-card::after {
+    width: 250px; height: 250px;
+    background: rgba(13, 148, 136, 0.4);
+    bottom: -80px; left: -50px;
+    animation: float 8s ease-in-out infinite reverse;
+  }
+
+  .hero-content { position: relative; z-index: 1; }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 100px;
+    padding: 6px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.02em;
+  }
+  .hero-badge i { animation: pulseGlow 2s infinite; border-radius: 50%; }
+
+  .hero-title {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .hero-title span { color: #A5B4FC; }
+
+  .hero-sub {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 2rem;
+    font-weight: 400;
+    max-width: 600px;
+    line-height: 1.6;
+  }
+
+  .hero-tags { display: flex; flex-wrap: wrap; gap: 10px; }
+  .hero-tag {
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 12px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: transform 0.2s;
+  }
+  .hero-tag:hover { transform: translateY(-2px); background: rgba(255,255,255,0.25); }
+
+  /* CARDS & GRIDS */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    opacity: 0; /* For animation */
+    animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary-light);
+  }
+
+  /* METRICS */
+  .metric-card { text-align: left; }
+  .metric-icon { 
+    width: 40px; height: 40px; 
+    border-radius: 10px; 
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; margin-bottom: 12px;
+  }
+  .metric-val { font-size: 28px; font-weight: 800; color: var(--text-dark); line-height: 1; margin-bottom: 6px; }
+  .metric-label { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+  .metric-desc { font-size: 12px; color: var(--text-muted); opacity: 0.8; margin-top: 4px; }
+
+  /* FEATURES */
+  .feat-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+    transition: transform 0.3s ease;
+  }
+  .card:hover .feat-icon { transform: scale(1.1) rotate(-5deg); }
+  .feat-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text-dark); }
+  .feat-desc { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+  /* VOICE DEMO */
+  .voice-demo {
+    background: var(--text-dark);
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  }
+  .voice-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;
+  }
+  .voice-demo-title { font-size: 13px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.1em; }
+  .status-dot { width: 8px; height: 8px; background: #10B981; border-radius: 50%; box-shadow: 0 0 10px #10B981; animation: pulseGlow 2s infinite; }
+  
+  .voice-bubble { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 1rem; opacity: 0; animation: slideInRight 0.5s forwards; }
+  .voice-bubble.ai { flex-direction: row-reverse; }
+  .voice-ava {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; flex-shrink: 0;
+  }
+  .voice-text {
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px 20px 20px 4px; padding: 12px 16px;
+    font-size: 14px; color: white; max-width: 80%; line-height: 1.6;
+  }
+  .voice-bubble.ai .voice-text {
+    background: var(--primary); border-color: var(--primary-hover);
+    border-radius: 20px 20px 4px 20px;
+  }
+
+  /* LISTS & MODULES */
+  .mod-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .mod-list { list-style: none; }
+  .mod-list li {
+    font-size: 14px; color: var(--text-muted); padding: 8px 0;
+    border-bottom: 1px dashed var(--border-light);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .mod-list li:last-child { border-bottom: none; }
+  .mod-list li i { color: var(--primary); font-size: 16px; }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 20px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; top: 10px; bottom: 10px;
+    width: 2px; background: var(--border-light);
+  }
+  .tl-phase {
+    position: relative; margin-bottom: 1.5rem;
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg); padding: 1.25rem;
+    box-shadow: var(--shadow-sm); transition: all 0.3s ease;
+  }
+  .tl-phase::before {
+    content: ''; position: absolute; left: -25px; top: 24px;
+    width: 12px; height: 12px; border-radius: 50%; background: var(--primary);
+    border: 3px solid var(--bg-main); box-shadow: 0 0 0 2px var(--primary-light);
+    transition: all 0.3s ease;
+  }
+  .tl-phase:hover { border-color: var(--primary-light); transform: translateX(4px); }
+  .tl-phase:hover::before { transform: scale(1.2); }
+  .tl-phase.open { border-color: var(--primary); box-shadow: var(--shadow-md); }
+  .tl-head { display: flex; align-items: center; gap: 16px; cursor: pointer; }
+  .tl-date {
+    background: var(--primary-light); color: var(--primary);
+    font-size: 12px; font-weight: 700; padding: 6px 12px;
+    border-radius: 100px; white-space: nowrap;
+  }
+  .tl-phase-title { font-size: 16px; font-weight: 700; flex: 1; color: var(--text-dark); }
+  .tl-toggle { color: var(--text-muted); transition: transform 0.3s ease; font-size: 20px; }
+  .tl-phase.open .tl-toggle { transform: rotate(180deg); color: var(--primary); }
+  .tl-body {
+    display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.3s ease;
+  }
+  .tl-phase.open .tl-body { grid-template-rows: 1fr; }
+  .tl-body-inner { overflow: hidden; }
+  .tl-content { margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border-light); }
+  
+  .tl-person-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .tl-person { background: var(--bg-main); border-radius: var(--radius-md); padding: 12px; border: 1px solid var(--border-light); }
+  .tl-person-name { font-size: 12px; font-weight: 700; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .tl-task { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+  /* MVP BADGES */
+  .mvp-item {
+    display: flex; align-items: center; gap: 16px; padding: 16px;
+    background: var(--bg-card); border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg); margin-bottom: 10px;
+    transition: transform 0.2s;
+  }
+  .mvp-item:hover { transform: scale(1.01); box-shadow: var(--shadow-md); }
+  .mvp-num {
+    width: 36px; height: 36px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; flex-shrink: 0;
+  }
+  .mvp-name { font-size: 16px; font-weight: 600; flex: 1; color: var(--text-dark); }
+  .mvp-tier { font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 100px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  /* SYSTEM ARCHITECTURE (NEW) */
+  .arch-box {
+    text-align: center; padding: 20px; border-radius: var(--radius-lg);
+    background: var(--bg-card); border: 2px dashed var(--border-light);
+    position: relative;
+  }
+  .arch-arrow { display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--text-muted); }
+  
+  /* CODE FONT */
+  .code-text { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--primary); background: var(--primary-light); padding: 4px 8px; border-radius: 6px; }
+
+</style>
+
+<div class="voc-wrap">
+  <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;">Vocalet Presentation</h2>
+
+  <div class="nav-container">
+    <nav class="nav">
+      <button class="active" onclick="show('overview', this)"><i class="ti ti-home" aria-hidden="true"></i> Overview</button>
+      <button onclick="show('latar-belakang', this)"><i class="ti ti-bulb" aria-hidden="true"></i> Latar Belakang</button>
+      <button onclick="show('features', this)"><i class="ti ti-stars" aria-hidden="true"></i> Fitur & Value</button>
+      <button onclick="show('modules', this)"><i class="ti ti-layout-grid" aria-hidden="true"></i> Modul</button>
+      <button onclick="show('arsitektur', this)"><i class="ti ti-schema" aria-hidden="true"></i> Arsitektur</button>
+      <button onclick="show('tech', this)"><i class="ti ti-code" aria-hidden="true"></i> Tech Stack</button>
+      <button onclick="show('team', this)"><i class="ti ti-users" aria-hidden="true"></i> Tim</button>
+      <button onclick="show('timeline', this)"><i class="ti ti-calendar" aria-hidden="true"></i> Timeline & MVP</button>
+    </nav>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="section active" id="overview">
+    <div class="hero-card">
+      <div class="hero-content">
+        <div class="hero-badge"><i class="ti ti-microphone"></i> Voice-Powered Financial Assistant</div>
+        <div class="hero-title">Vocalet<span>.</span></div>
+        <div class="hero-sub">Aplikasi pencatatan keuangan, kalkulasi zakat, dan manajemen UMKM pertama di Indonesia yang sepenuhnya dikendalikan oleh perintah suara. Hadir untuk mendobrak batasan aksesibilitas digital.</div>
+        <div class="hero-tags">
+          <span class="hero-tag"><i class="ti ti-check"></i> Voice First</span>
+          <span class="hero-tag"><i class="ti ti-accessible"></i> Ramah Disabilitas</span>
+          <span class="hero-tag"><i class="ti ti-brain"></i> Gemini AI Powered</span>
+          <span class="hero-tag"><i class="ti ti-qrcode"></i> Terintegrasi QRIS</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-4 stagger-1">
+      <div class="card metric-card">
+        <div class="metric-icon" style="background: var(--primary-light); color: var(--primary);"><i class="ti ti-target"></i></div>
+        <div class="metric-val">3</div>
+        <div class="metric-label">Target Persona</div>
+        <div class="metric-desc">Individu, UMKM, Disabilitas/Lansia</div>
+      </div>
+      <div class="card metric-card">
+        <div class="metric-icon" style="background: var(--secondary-light); color: var(--secondary);"><i class="ti ti-box"></i></div>
+        <div class="metric-val">12+</div>
+        <div class="metric-label">Modul Aktif</div>
+        <div class="metric-desc">Pencatatan s/d Laporan Otomatis</div>
+      </div>
+      <div class="card metric-card">
+        <div class="metric-icon" style="background: var(--accent-light); color: var(--accent);"><i class="ti ti-users-group"></i></div>
+        <div class="metric-val">3</div>
+        <div class="metric-label">Engineers Tim</div>
+        <div class="metric-desc">Fullstack, AI Integrator, & UI/UX</div>
+      </div>
+      <div class="card metric-card">
+        <div class="metric-icon" style="background: #FCEBEB; color: #DC2626;"><i class="ti ti-clock-bolt"></i></div>
+        <div class="metric-val">10</div>
+        <div class="metric-label">Juli 2026</div>
+        <div class="metric-desc">Target Rilis MVP Final</div>
+      </div>
+    </div>
+
+    <p class="sec-title stagger-2"><i class="ti ti-message-chatbot"></i> Simulasi AI Voice Command</p>
+    <div class="voice-demo stagger-3">
+      <div class="voice-header">
+        <div class="voice-demo-title">Live Conversation Preview</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#10B981;"><div class="status-dot"></div> AI Active</div>
+      </div>
+      <div class="voice-bubble" style="animation-delay: 0.5s;">
+        <div class="voice-ava" style="background:#E2E8F0;color:#0F172A;"><i class="ti ti-user"></i></div>
+        <div class="voice-text">🎙️ "Tolong catat pemasukan dari jualan nasi goreng hari ini sebesar empat ratus ribu rupiah."</div>
+      </div>
+      <div class="voice-bubble ai" style="animation-delay: 1.5s;">
+        <div class="voice-ava" style="background:var(--primary-light);color:var(--primary);"><i class="ti ti-robot"></i></div>
+        <div class="voice-text">Siapp! Pemasukan sebesar <strong>Rp400.000</strong> dengan kategori "Penjualan Nasi Goreng" berhasil dicatat. Saldo kas UMKM kamu sekarang menjadi Rp1.250.000. Ada lagi yang ingin dicatat?</div>
+      </div>
+      <div class="voice-bubble" style="animation-delay: 2.5s;">
+        <div class="voice-ava" style="background:#E2E8F0;color:#0F172A;"><i class="ti ti-user"></i></div>
+        <div class="voice-text">🎙️ "Coba hitungkan zakat penghasilan saya bulan ini."</div>
+      </div>
+      <div class="voice-bubble ai" style="animation-delay: 3.5s;">
+        <div class="voice-ava" style="background:var(--primary-light);color:var(--primary);"><i class="ti ti-robot"></i></div>
+        <div class="voice-text">Penghasilan tercatat kamu bulan ini adalah Rp10.500.000. Karena sudah mencapai nisab, zakat yang wajib dibayarkan adalah 2,5%, yaitu sebesar <strong>Rp262.500</strong>. Ingin saya ingatkan untuk bayar?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LATAR BELAKANG (NEW) -->
+  <div class="section" id="latar-belakang">
+    <p class="sec-title"><i class="ti ti-bulb"></i> Mengapa Vocalet Diciptakan?</p>
+    <div class="grid-3">
+      <div class="card stagger-1">
+        <div class="feat-icon" style="background:#FCEBEB;color:#DC2626;"><i class="ti ti-accessible-off"></i></div>
+        <div class="feat-title">Kesenjangan Aksesibilitas</div>
+        <div class="feat-desc">Aplikasi keuangan saat ini sangat mengandalkan interaksi layar sentuh dan teks kecil. Ini menjadi dinding penghalang besar bagi penyandang tunanetra dan kelompok lanjut usia.</div>
+      </div>
+      <div class="card stagger-2">
+        <div class="feat-icon" style="background:var(--accent-light);color:var(--accent);"><i class="ti ti-notebook"></i></div>
+        <div class="feat-title">Pencatatan UMKM Tradisional</div>
+        <div class="feat-desc">60% pelaku usaha mikro masih mencatat di buku tulis. Rentan hilang, sulit dilacak, dan mustahil menghasilkan laporan keuangan (Laba/Rugi) yang rapi untuk pinjaman modal.</div>
+      </div>
+      <div class="card stagger-3">
+        <div class="feat-icon" style="background:var(--secondary-light);color:var(--secondary);"><i class="ti ti-calculator-off"></i></div>
+        <div class="feat-title">Literasi & Perhitungan Zakat</div>
+        <div class="feat-desc">Banyak umat muslim bingung mengenai perhitungan <i>Nisab</i> dan persentase zakat dari harta campuran, sehingga pembayaran zakat sering terlewat atau tidak akurat.</div>
+      </div>
+    </div>
+    
+    <div class="card stagger-4" style="margin-top: 1.5rem; background: var(--primary); color: white;">
+      <div style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Solusi Vocalet 💡</div>
+      <div style="font-size: 15px; opacity: 0.9; line-height: 1.6;">Menjembatani kesenjangan tersebut melalui teknologi <strong>Natural Language Processing (NLP)</strong>. Pengguna cukup berbicara seperti kepada asisten manusia, dan AI kami akan mengklasifikasikan ucapan menjadi struktur data finansial (JSON) yang terstruktur di database.</div>
+    </div>
+  </div>
+
+  <!-- FITUR -->
+  <div class="section" id="features">
+    <p class="sec-title"><i class="ti ti-diamond"></i> Value Proposition Utama</p>
+    <div class="grid-3">
+      <div class="card stagger-1">
+        <div class="feat-icon" style="background:var(--primary-light);color:var(--primary);"><i class="ti ti-microphone-2"></i></div>
+        <div class="feat-title">Zero-Touch Interface</div>
+        <div class="feat-desc">Input data pemasukan, pengeluaran, hingga pembuatan laporan murni melalui perintah suara tanpa perlu navigasi menu yang rumit.</div>
+      </div>
+      <div class="card stagger-2">
+        <div class="feat-icon" style="background:var(--secondary-light);color:var(--secondary);"><i class="ti ti-eye-check"></i></div>
+        <div class="feat-title">Desain Inklusif</div>
+        <div class="feat-desc">Didukung kontras tinggi, typography ekstra besar, dan dukungan <i>Screen Reader</i>. Fitur <i>Text-to-Speech</i> membacakan ulang aksi ke pengguna.</div>
+      </div>
+      <div class="card stagger-3">
+        <div class="feat-icon" style="background:var(--accent-light);color:var(--accent);"><i class="ti ti-coins"></i></div>
+        <div class="feat-title">Auto-Zakat Calculator</div>
+        <div class="feat-desc">Algoritma otomatis mendeteksi apakah total aset/penghasilan sudah mencapai ambang batas (Nisab) dan menghitung nilai zakat aktual.</div>
+      </div>
+      <div class="card stagger-4">
+        <div class="feat-icon" style="background:#E0F2FE;color:#0284C7;"><i class="ti ti-building-store"></i></div>
+        <div class="feat-title">Ekosistem UMKM</div>
+        <div class="feat-desc">Bukan sekadar pencatatan pribadi, tapi mendukung manajemen multi-produk, tracking stok masuk/keluar, hingga data supplier.</div>
+      </div>
+      <div class="card stagger-4">
+        <div class="feat-icon" style="background:#F3E8FF;color:#9333EA;"><i class="ti ti-qrcode"></i></div>
+        <div class="feat-title">Midtrans Integration</div>
+        <div class="feat-desc">Dukungan pembayaran digital instan melalui generate QRIS dinamis, e-Wallet, dan Virtual Account untuk transaksi UMKM.</div>
+      </div>
+      <div class="card stagger-4">
+        <div class="feat-icon" style="background:#ECFCCB;color:#65A30D;"><i class="ti ti-shield-lock"></i></div>
+        <div class="feat-title">Keamanan Data</div>
+        <div class="feat-desc">Autentikasi berlapis menggunakan Laravel Sanctum Token, enkripsi password bcrypt, dan perlindungan API rate limiting.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODUL -->
+  <div class="section" id="modules">
+    <div class="grid-2">
+      <!-- Modul Individu -->
+      <div class="stagger-1">
+        <p class="sec-title"><i class="ti ti-user"></i> Modul Individu</p>
+        <div class="card" style="margin-bottom: 1.25rem;">
+          <div class="mod-header">
+            <div class="feat-icon" style="margin:0; background:var(--primary-light); color:var(--primary);"><i class="ti ti-wallet"></i></div>
+            <div>
+              <div style="font-size: 16px; font-weight: 700;">Keuangan Personal</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Tracker harian & bulanan</div>
+            </div>
+          </div>
+          <ul class="mod-list">
+            <li><i class="ti ti-arrow-right"></i>Pencatatan Pemasukan & Pengeluaran via Voice</li>
+            <li><i class="ti ti-arrow-right"></i>Kategori cerdas otomatis oleh AI</li>
+            <li><i class="ti ti-arrow-right"></i>Grafik analisis arus kas bulanan</li>
+            <li><i class="ti ti-arrow-right"></i>Goal savings & budgeting</li>
+          </ul>
+        </div>
+        
+        <div class="card">
+          <div class="mod-header">
+            <div class="feat-icon" style="margin:0; background:var(--accent-light); color:var(--accent);"><i class="ti ti-moon-stars"></i></div>
+            <div>
+              <div style="font-size: 16px; font-weight: 700;">Manajemen Zakat</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Sesuai kaidah syariat</div>
+            </div>
+          </div>
+          <ul class="mod-list">
+            <li><i class="ti ti-arrow-right"></i>Kalkulator Zakat Fitrah & Maal (Penghasilan)</li>
+            <li><i class="ti ti-arrow-right"></i>Pengecekan harga Emas Antam (API) untuk Nisab</li>
+            <li><i class="ti ti-arrow-right"></i>Push Notification reminder bayar zakat</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Modul UMKM -->
+      <div class="stagger-2">
+        <p class="sec-title"><i class="ti ti-building-store"></i> Modul Bisnis UMKM</p>
+        <div class="card" style="height: calc(100% - 64px);"> <!-- Stretch to match left side height -->
+          <ul class="mod-list" style="margin-bottom: 20px;">
+            <li><i class="ti ti-box"></i><strong>Katalog Produk:</strong> Kelola SKU, harga modal, harga jual.</li>
+            <li><i class="ti ti-packages"></i><strong>Inventory:</strong> Peringatan stok menipis, restock via suara.</li>
+            <li><i class="ti ti-users"></i><strong>CRM Mini:</strong> Data kontak pelanggan dan supplier langganan.</li>
+            <li><i class="ti ti-receipt"></i><strong>Invoice & QRIS:</strong> Buat PDF nota dan terima pembayaran cashless.</li>
+            <li><i class="ti ti-report-analytics"></i><strong>Laporan Keuangan:</strong> Laba/Rugi, Neraca Saldo, Arus Kas otomatis tersusun standar akuntansi dasar.</li>
+          </ul>
+          
+          <div style="background: var(--bg-main); padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--border-light);">
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">Contoh Perintah UMKM</div>
+            <div class="code-text" style="margin-bottom: 6px;">"Ada pesanan 5 bungkus keripik pedas lunas ya"</div>
+            <div class="code-text" style="margin-bottom: 6px;">"Tolong buatkan QRIS 50 ribu untuk meja dua"</div>
+            <div class="code-text">"Bacakan ringkasan laba kotor hari ini"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ARSITEKTUR (NEW) -->
+  <div class="section" id="arsitektur">
+    <p class="sec-title"><i class="ti ti-schema"></i> Arsitektur Sistem (Voice-to-Database)</p>
+    <div class="card stagger-1" style="padding: 2.5rem 2rem;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
+        
+        <!-- Step 1 -->
+        <div class="arch-box" style="flex: 1; min-width: 150px;">
+          <div class="feat-icon" style="margin: 0 auto 12px; background:var(--primary-light); color:var(--primary);"><i class="ti ti-user-voice"></i></div>
+          <div style="font-weight: 700; font-size: 14px;">1. User Input</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Suara ditangkap oleh Mic (PWA)</div>
+        </div>
+
+        <div class="arch-arrow"><i class="ti ti-arrow-right"></i></div>
+
+        <!-- Step 2 -->
+        <div class="arch-box" style="flex: 1; min-width: 150px;">
+          <div class="feat-icon" style="margin: 0 auto 12px; background:#E0F2FE; color:#0284C7;"><i class="ti ti-brand-react-native"></i></div>
+          <div style="font-weight: 700; font-size: 14px;">2. Web Speech API</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Speech-to-Text di Frontend Next.js</div>
+        </div>
+
+        <div class="arch-arrow"><i class="ti ti-arrow-right"></i></div>
+
+        <!-- Step 3 -->
+        <div class="arch-box" style="flex: 1; min-width: 150px; border-color: var(--primary);">
+          <div class="feat-icon" style="margin: 0 auto 12px; background:#F3E8FF; color:#9333EA;"><i class="ti ti-brain"></i></div>
+          <div style="font-weight: 700; font-size: 14px; color: var(--primary);">3. Gemini AI Engine</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Backend Laravel kirim teks ke AI utk ekstraksi entitas (JSON)</div>
+        </div>
+
+        <div class="arch-arrow"><i class="ti ti-arrow-right"></i></div>
+
+        <!-- Step 4 -->
+        <div class="arch-box" style="flex: 1; min-width: 150px;">
+          <div class="feat-icon" style="margin: 0 auto 12px; background:#DCFCE7; color:#16A34A;"><i class="ti ti-database"></i></div>
+          <div style="font-weight: 700; font-size: 14px;">4. Eksekusi & Simpan</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Validasi logic & insert ke DB MySQL</div>
+        </div>
+
+      </div>
+      <div style="margin-top: 24px; text-align: center; font-size: 13px; color: var(--text-muted);">
+        *Response dari server kemudian diubah kembali menjadi suara melalui <strong>Text-to-Speech (TTS) API</strong> untuk mengonfirmasi tindakan kepada pengguna.
+      </div>
+    </div>
+  </div>
+
+  <!-- TECH STACK -->
+  <div class="section" id="tech">
+    <p class="sec-title"><i class="ti ti-code"></i> Technology Stack</p>
+    <div class="grid-3">
+      
+      <div class="card stagger-1">
+        <div style="font-size: 14px; font-weight: 800; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase;">Frontend App</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="feat-icon" style="margin:0; width:36px; height:36px; font-size:18px; background:#000; color:#fff;"><i class="ti ti-brand-nextjs"></i></div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">Next.js 15</div>
+              <div style="font-size: 12px; color: var(--text-muted);">React framework, PWA Support</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="feat-icon" style="margin:0; width:36px; height:36px; font-size:18px; background:#3178C6; color:#fff;"><i class="ti ti-brand-typescript"></i></div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">TypeScript</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Type safety & scalable code</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="feat-icon" style="margin:0; width:36px; height:36px; font-size:18px; background:#38BDF8; color:#fff;"><i class="ti ti-brand-tailwind"></i></div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">Tailwind CSS</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Rapid utility-first styling</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card stagger-2">
+        <div style="font-size: 14px; font-weight: 800; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase;">Backend & Database</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="feat-icon" style="margin:0; width:36px; height:36px; font-size:18px; background:#FF2D20; color:#fff;"><i class="ti ti-brand-laravel"></i></div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">Laravel 12 (API)</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Robust logic & Sanctum Auth</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="feat-icon" style="margin:0; width:36px; height:36px; font-size:18px; background:#4479A1; color:#fff;"><i class="ti ti-database"></i></div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">MySQL</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Relational database management</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="feat-icon" style="margin:0; width:36px; height:36px; font-size:18px; background:#FCA121; color:#fff;"><i class="ti ti-brand-firebase"></i></div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">Firebase FCM</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Push Notification Services</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card stagger-3">
+        <div style="font-size: 14px; font-weight: 800; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase;">AI & Integrations</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="feat-icon" style="margin:0; width:36px; height:36px; font-size:18px; background:#1A73E8; color:#fff;"><i class="ti ti-brand-google"></i></div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">Gemini AI Pro</div>
+              <div style="font-size: 12px; color: var(--text-muted);">NLP & Chatbot Engine</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="feat-icon" style="margin:0; width:36px; height:36px; font-size:18px; background:#10B981; color:#fff;"><i class="ti ti-microphone"></i></div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">Web Speech API</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Native Browser STT/TTS</div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <div class="feat-icon" style="margin:0; width:36px; height:36px; font-size:18px; background:#0F172A; color:#fff;"><i class="ti ti-credit-card"></i></div>
+            <div>
+              <div style="font-size: 14px; font-weight: 600;">Midtrans API</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Payment Gateway & QRIS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TEAM -->
+  <div class="section" id="team">
+    <p class="sec-title"><i class="ti ti-users"></i> Divisi Tim & Tanggung Jawab</p>
+    <div class="grid-3">
+      <div class="card stagger-1" style="text-align: center;">
+        <img src="https://ui-avatars.com/api/?name=F+D&background=EEEDFD&color=4F46E5&size=80" alt="Frontend" style="border-radius: 50%; margin-bottom: 16px;">
+        <div style="font-size: 16px; font-weight: 800; margin-bottom: 4px;">Frontend Engineer</div>
+        <div style="font-size: 12px; color: var(--primary); font-weight: 600; margin-bottom: 16px;">UI/UX • Next.js • PWA</div>
+        <ul style="list-style:none; text-align:left; font-size:13px; color:var(--text-muted); line-height:1.6;">
+          <li><i class="ti ti-check" style="color:var(--primary); margin-right:6px;"></i> Wireframing & Design System</li>
+          <li><i class="ti ti-check" style="color:var(--primary); margin-right:6px;"></i> Styling Tailwind & Shadcn UI</li>
+          <li><i class="ti ti-check" style="color:var(--primary); margin-right:6px;"></i> Responsive & Accessibility (a11y)</li>
+          <li><i class="ti ti-check" style="color:var(--primary); margin-right:6px;"></i> State management (Zustand/Redux)</li>
+        </ul>
+      </div>
+
+      <div class="card stagger-2" style="text-align: center;">
+        <img src="https://ui-avatars.com/api/?name=B+E&background=CCFBF1&color=0D9488&size=80" alt="Backend" style="border-radius: 50%; margin-bottom: 16px;">
+        <div style="font-size: 16px; font-weight: 800; margin-bottom: 4px;">Backend Engineer</div>
+        <div style="font-size: 12px; color: var(--secondary); font-weight: 600; margin-bottom: 16px;">Laravel • MySQL • API</div>
+        <ul style="list-style:none; text-align:left; font-size:13px; color:var(--text-muted); line-height:1.6;">
+          <li><i class="ti ti-check" style="color:var(--secondary); margin-right:6px;"></i> Arsitektur Database (ERD)</li>
+          <li><i class="ti ti-check" style="color:var(--secondary); margin-right:6px;"></i> RESTful API Creation</li>
+          <li><i class="ti ti-check" style="color:var(--secondary); margin-right:6px;"></i> Logic Akuntansi & Zakat</li>
+          <li><i class="ti ti-check" style="color:var(--secondary); margin-right:6px;"></i> Auth & Data Security</li>
+        </ul>
+      </div>
+
+      <div class="card stagger-3" style="text-align: center;">
+        <img src="https://ui-avatars.com/api/?name=A+I&background=FEF3C7&color=D97706&size=80" alt="AI Specialist" style="border-radius: 50%; margin-bottom: 16px;">
+        <div style="font-size: 16px; font-weight: 800; margin-bottom: 4px;">AI & Integrator</div>
+        <div style="font-size: 12px; color: var(--accent); font-weight: 600; margin-bottom: 16px;">Gemini • Voice • APIs</div>
+        <ul style="list-style:none; text-align:left; font-size:13px; color:var(--text-muted); line-height:1.6;">
+          <li><i class="ti ti-check" style="color:var(--accent); margin-right:6px;"></i> Prompt Engineering Gemini</li>
+          <li><i class="ti ti-check" style="color:var(--accent); margin-right:6px;"></i> Implementasi STT & TTS Native</li>
+          <li><i class="ti ti-check" style="color:var(--accent); margin-right:6px;"></i> Setup Midtrans Payment</li>
+          <li><i class="ti ti-check" style="color:var(--accent); margin-right:6px;"></i> PDF Generator & FCM Setup</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMELINE & MVP -->
+  <div class="section" id="timeline">
+    <div class="grid-2">
+      <!-- MVP Column -->
+      <div class="stagger-1">
+        <p class="sec-title"><i class="ti ti-target"></i> Prioritas MVP</p>
+        <div class="card" style="margin-bottom: 1rem; border-left: 4px solid var(--primary);">
+          <div style="font-size: 13px; font-weight: 700; margin-bottom: 6px;">Strategi Pengerjaan</div>
+          <div style="font-size: 12px; color: var(--text-muted); line-height: 1.6;">Fokus pada "Core Unique Value" terlebih dahulu (Aksesibilitas Suara + Pencatatan). Jika waktu mepet, modul laporan advance dan QRIS bisa dijadikan <i>phase 2</i>.</div>
+        </div>
+        <div id="mvp-list"></div>
+      </div>
+
+      <!-- Timeline Column -->
+      <div class="stagger-2">
+        <p class="sec-title"><i class="ti ti-calendar"></i> Timeline (8 Jun - 10 Jul 2026)</p>
+        <div class="timeline" id="tl"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Tab Switching Logic with animation reset
+  function show(id, btnElement) {
+    // Handle Nav Classes
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+    btnElement.classList.add('active');
+
+    // Handle Sections & Re-trigger Animations
+    document.querySelectorAll('.section').forEach(s => {
+      s.classList.remove('active');
+      s.style.animation = 'none'; // reset animation
+      s.offsetHeight; /* trigger reflow */
+      s.style.animation = null; 
+    });
+
+    const activeSection = document.getElementById(id);
+    activeSection.classList.add('active');
+    
+    // Smooth scroll slightly to top if needed
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // --- POPULATE TIMELINE DATA ---
+  const phases = [
+    {
+      date: '8-10 Jun',
+      title: 'Design & Schema Phase',
+      tasks: ['Wireframe & UI Kit (FE)', 'ERD & Database Setup (BE)', 'Research Voice API & Prompting (AI)'],
+      status: 'On Track',
+      color: 'var(--primary)'
+    },
+    {
+      date: '11-17 Jun',
+      title: 'Core App & Transaksi',
+      tasks: ['Layouting Next.js & Auth (FE)', 'API Transaksi Basic (BE)', 'Integrasi Voice MVP (AI)'],
+      status: 'Upcoming',
+      color: 'var(--secondary)'
+    },
+    {
+      date: '18-25 Jun',
+      title: 'Zakat & Modul UMKM',
+      tasks: ['UI Kalkulator Zakat & UMKM (FE)', 'Logic Kalkulasi & Inventory API (BE)', 'Training prompt Zakat/UMKM (AI)'],
+      status: 'Upcoming',
+      color: 'var(--accent)'
+    },
+    {
+      date: '26 Jun - 3 Jul',
+      title: 'Laporan & Integrasi External',
+      tasks: ['Dashboard Laporan & Chart (FE)', 'Generate PDF & Report API (BE)', 'Midtrans QRIS & Notifikasi (AI)'],
+      status: 'Upcoming',
+      color: '#6366F1' /* Indigo */
+    },
+    {
+      date: '4-10 Jul',
+      title: 'Testing, QA, & Deployment',
+      tasks: ['Accessibility Check & Polish (FE)', 'Load Testing & Security (BE)', 'E2E Testing Voice System (AI)'],
+      status: 'Milestone',
+      color: '#EF4444' /* Red */
+    }
+  ];
+
+  const tl = document.getElementById('tl');
+  phases.forEach((ph, i) => {
+    const el = document.createElement('div');
+    el.className = `tl-phase ${i === 0 ? 'open' : ''}`;
+    
+    let tasksHtml = '';
+    const roles = ['Frontend', 'Backend', 'AI'];
+    ph.tasks.forEach((task, index) => {
+      tasksHtml += `
+        <div style="margin-bottom: 8px; font-size: 13px;">
+          <strong style="color: ${ph.color}; font-size: 11px; text-transform: uppercase;">[${roles[index]}]</strong> ${task}
+        </div>
+      `;
+    });
+
+    el.innerHTML = `
+      <div class="tl-head" onclick="this.parentElement.classList.toggle('open')">
+        <span class="tl-date" style="background:${ph.color}15; color:${ph.color};">${ph.date}</span>
+        <span class="tl-phase-title">${ph.title}</span>
+        <i class="ti ti-chevron-down tl-toggle" aria-hidden="true"></i>
+      </div>
+      <div class="tl-body">
+        <div class="tl-body-inner">
+          <div class="tl-content">
+            ${tasksHtml}
+            <div style="margin-top: 10px; display: inline-block; background: var(--bg-main); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; color: var(--text-muted); border: 1px solid var(--border-light);">
+               Status: ${ph.status}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    tl.appendChild(el);
+  });
+
+  // --- POPULATE MVP DATA ---
+  const mvpItems = [
+    { name: 'Core Engine (Auth, DB Setup)', tier: 'P0 - Blockers', color: '#DC2626', bg: '#FCEBEB', icon: 'engine' },
+    { name: 'Pencatatan Finansial (In/Out)', tier: 'P1 - Core', color: '#EA580C', bg: '#FFEDD5', icon: 'wallet' },
+    { name: 'Voice Command (STT & NLP)', tier: 'P1 - Core Unique', color: '#4F46E5', bg: '#EEEDFD', icon: 'microphone-2' },
+    { name: 'Kalkulator Zakat Fitrah & Maal', tier: 'P1 - Core', color: '#0D9488', bg: '#CCFBF1', icon: 'moon-stars' },
+    { name: 'Katalog Produk & Stok UMKM', tier: 'P2 - Important', color: '#0284C7', bg: '#E0F2FE', icon: 'box' },
+    { name: 'Laporan PDF & Chart Interaktif', tier: 'P2 - Important', color: '#9333EA', bg: '#F3E8FF', icon: 'report-analytics' },
+    { name: 'Midtrans QRIS Generation', tier: 'P3 - Bonus', color: '#475569', bg: '#F1F5F9', icon: 'qrcode' },
+  ];
+
+  const mvpEl = document.getElementById('mvp-list');
+  mvpItems.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'mvp-item';
+    div.innerHTML = `
+      <div class="mvp-num" style="background:${item.bg};color:${item.color};"><i class="ti ti-${item.icon}"></i></div>
+      <div class="mvp-name">${item.name}</div>
+      <div class="mvp-tier" style="background:${item.bg};color:${item.color};">${item.tier}</div>
+    `;
+    mvpEl.appendChild(div);
+  });
+</script>
